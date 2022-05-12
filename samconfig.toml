@@ -1,0 +1,13 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "sam-app-appconfig"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-qo8yjt1ytihm"
+s3_prefix = "sam-app-appconfig"
+region = "us-east-1"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+parameter_overrides = "AppConfigApplication=\"SamFeatureToggleApplication\" AppConfigEnvironment=\"SamFeatureToggleEnvironment\" AppConfigConfigurationProfile=\"SamFeatureToggleConfigurationProfile\" AppConfigARN=\"arn:aws:lambda:eu-east-1:434848589818:layer:AWS-AppConfig-Extension:62\""
+image_repositories = []

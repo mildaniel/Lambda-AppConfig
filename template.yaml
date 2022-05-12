@@ -1,0 +1,62 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  AppConfigApplication:
+    Type: String
+    Description: Id of AppConfig Application
+    Default: SamFeatureToggleApplication
+  AppConfigEnvironment:
+    Type: String
+    Description: Id of AppConfig Environment
+    Default: SamFeatureToggleEnvironment
+  AppConfigConfigurationProfile:
+    Type: String
+    Description: Id of AppConfig Configuration Profile
+    Default: SamFeatureToggleConfigurationProfile
+  AppConfigARN:
+    Type: String
+    Default: 'arn:aws:lambda:us-east-1:027255383542:layer:AWS-AppConfig-Extension:69'
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Layers:
+        - !Ref AppConfigARN
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          APPCONFIG_APPLICATION: !Ref AppConfigApplication
+          APPCONFIG_ENVIRONMENT: !Ref AppConfigEnvironment
+          APPCONFIG_CONFIGURATION: !Ref AppConfigConfigurationProfile
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - appconfig:GetLatestConfiguration
+                - appconfig:StartConfigurationSession
+              Resource:
+                - !Sub 'arn:aws:appconfig:*:*:application/${AppConfigApplication}/environment/${AppConfigEnvironment}/configuration/${AppConfigConfigurationProfile}'
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
+  HelloWorldFunctionIamRole:
+    Description: "Implicit IAM Role created for Hello World function"
+    Value: !GetAtt HelloWorldFunctionRole.Arn
